@@ -32,34 +32,11 @@ const closeModal =
     document.getElementById("closeModal");
 
 
-/* =========================
-   필터 옵션 생성
-========================= */
+/* =========================================
+   수감자 필터 생성
+========================================= */
 
 function setupFilters() {
-
-    const seasons =
-        [...new Set(
-            identities.map(
-                identity => identity.season
-            )
-        )].sort((a, b) => a - b);
-
-
-    seasons.forEach(season => {
-
-        const option =
-            document.createElement("option");
-
-        option.value = season;
-
-        option.textContent =
-            `시즌 ${season}`;
-
-        seasonFilter.appendChild(option);
-
-    });
-
 
     const sinners =
         [...new Set(
@@ -85,9 +62,9 @@ function setupFilters() {
 }
 
 
-/* =========================
+/* =========================================
    별 표시
-========================= */
+========================================= */
 
 function getStars(grade) {
 
@@ -96,9 +73,9 @@ function getStars(grade) {
 }
 
 
-/* =========================
-   카드 생성
-========================= */
+/* =========================================
+   인격 카드
+========================================= */
 
 function createCard(identity) {
 
@@ -126,7 +103,7 @@ function createCard(identity) {
     card.innerHTML = `
 
         <div class="identity-season">
-            시즌 ${identity.season}
+            ${identity.season}
         </div>
 
         <div class="identity-sinner">
@@ -159,9 +136,9 @@ function createCard(identity) {
 }
 
 
-/* =========================
-   인격 표시
-========================= */
+/* =========================================
+   인격 필터링
+========================================= */
 
 function renderIdentities() {
 
@@ -174,11 +151,14 @@ function renderIdentities() {
     const selectedSeason =
         seasonFilter.value;
 
+
     const selectedSinner =
         sinnerFilter.value;
 
+
     const selectedGrade =
         gradeFilter.value;
+
 
     const selectedType =
         typeFilter.value;
@@ -187,40 +167,55 @@ function renderIdentities() {
     const filtered =
         identities.filter(identity => {
 
-            /* 시즌 */
+
+            /* -------------------------
+               분류
+            ------------------------- */
 
             if (
                 selectedSeason !== "all" &&
-                String(identity.season)
+                identity.season
                     !== selectedSeason
             ) {
+
                 return false;
+
             }
 
 
-            /* 수감자 */
+            /* -------------------------
+               수감자
+            ------------------------- */
 
             if (
                 selectedSinner !== "all" &&
                 identity.sinner
                     !== selectedSinner
             ) {
+
                 return false;
+
             }
 
 
-            /* 등급 */
+            /* -------------------------
+               등급
+            ------------------------- */
 
             if (
                 selectedGrade !== "all" &&
                 String(identity.grade)
                     !== selectedGrade
             ) {
+
                 return false;
+
             }
 
 
-            /* 공격 유형 */
+            /* -------------------------
+               공격 유형
+            ------------------------- */
 
             if (
                 selectedType !== "all" &&
@@ -228,16 +223,23 @@ function renderIdentities() {
                     selectedType
                 )
             ) {
+
                 return false;
+
             }
 
 
-            /* 검색 */
+            /* -------------------------
+               검색
+            ------------------------- */
 
             if (search !== "") {
 
                 let searchText = "";
 
+
+                searchText +=
+                    identity.season + " ";
 
                 searchText +=
                     identity.sinner + " ";
@@ -252,26 +254,30 @@ function renderIdentities() {
                     identity.attackTypes.join(" ");
 
 
-                identity.skills.forEach(skill => {
-
-                    searchText +=
-                        " " + skill.name;
-
-                    searchText +=
-                        " " + skill.type;
-
-                    searchText +=
-                        " " + skill.description;
-
-
-                    skill.coins.forEach(coin => {
+                identity.skills.forEach(
+                    skill => {
 
                         searchText +=
-                            " " + coin.effect;
+                            " " + skill.name;
 
-                    });
+                        searchText +=
+                            " " + skill.type;
 
-                });
+                        searchText +=
+                            " " + skill.description;
+
+
+                        skill.coins.forEach(
+                            coin => {
+
+                                searchText +=
+                                    " " + coin.effect;
+
+                            }
+                        );
+
+                    }
+                );
 
 
                 searchText =
@@ -281,7 +287,9 @@ function renderIdentities() {
                 if (
                     !searchText.includes(search)
                 ) {
+
                     return false;
+
                 }
 
             }
@@ -291,6 +299,10 @@ function renderIdentities() {
 
         });
 
+
+    /* -------------------------
+       출력
+    ------------------------- */
 
     grid.innerHTML = "";
 
@@ -303,6 +315,10 @@ function renderIdentities() {
 
     });
 
+
+    /* -------------------------
+       결과 없음
+    ------------------------- */
 
     if (filtered.length === 0) {
 
@@ -324,9 +340,9 @@ function renderIdentities() {
 }
 
 
-/* =========================
+/* =========================================
    제목
-========================= */
+========================================= */
 
 function updateTitle() {
 
@@ -340,16 +356,16 @@ function updateTitle() {
     } else {
 
         seasonTitle.textContent =
-            `시즌 ${seasonFilter.value}`;
+            seasonFilter.value;
 
     }
 
 }
 
 
-/* =========================
+/* =========================================
    상세 정보
-========================= */
+========================================= */
 
 function openDetail(identity) {
 
@@ -357,25 +373,33 @@ function openDetail(identity) {
 
 
     identity.skills.forEach(
-        (skill, skillIndex) => {
+        skill => {
 
             let coinsHTML = "";
 
 
             skill.coins.forEach(
-                (coin, coinIndex) => {
+                (coin, index) => {
 
                     coinsHTML += `
 
                         <div class="coin">
 
                             <div class="coin-number">
-                                🪙 코인 ${coinIndex + 1}
-                                &nbsp; +${coin.power}
+
+                                🪙 코인 ${index + 1}
+
+                                &nbsp;
+
+                                +${coin.power}
+
                             </div>
 
+
                             <div class="coin-effect">
+
                                 ${coin.effect}
+
                             </div>
 
                         </div>
@@ -391,8 +415,11 @@ function openDetail(identity) {
                 <div class="skill">
 
                     <div class="skill-title">
+
                         ${skill.name}
+
                     </div>
+
 
                     <div class="skill-info">
 
@@ -413,7 +440,9 @@ function openDetail(identity) {
 
 
                     <div class="description">
+
                         ${skill.description}
+
                     </div>
 
 
@@ -440,16 +469,19 @@ function openDetail(identity) {
         <div class="detail-header">
 
             <div class="detail-season">
-                시즌 ${identity.season}
+                ${identity.season}
             </div>
+
 
             <div class="detail-sinner">
                 ${identity.sinner}
             </div>
 
+
             <div class="detail-name">
                 ${identity.name}
             </div>
+
 
             <div class="detail-grade">
                 ${getStars(identity.grade)}
@@ -464,14 +496,16 @@ function openDetail(identity) {
                 키워드
             </h3>
 
+
             <div class="identity-tags">
 
                 ${identity.keywords
                     .map(
-                        keyword =>
-                        `<span class="tag">
-                            ${keyword}
-                        </span>`
+                        keyword => `
+                            <span class="tag">
+                                ${keyword}
+                            </span>
+                        `
                     )
                     .join("")
                 }
@@ -498,21 +532,32 @@ function openDetail(identity) {
                 방어 스킬
             </h3>
 
+
             <div class="skill">
 
                 <div class="skill-title">
+
                     ${identity.defenseSkill.name}
+
                 </div>
+
 
                 <div class="skill-info">
+
                     ${identity.defenseSkill.type}
+
                     <br>
+
                     기본 위력:
                     ${identity.defenseSkill.basePower}
+
                 </div>
 
+
                 <div class="description">
+
                     ${identity.defenseSkill.description}
+
                 </div>
 
             </div>
@@ -526,8 +571,11 @@ function openDetail(identity) {
                 패시브
             </h3>
 
+
             <div class="description">
+
                 ${identity.passive}
+
             </div>
 
         </div>
@@ -539,8 +587,11 @@ function openDetail(identity) {
                 서포트 패시브
             </h3>
 
+
             <div class="description">
+
                 ${identity.supportPassive}
+
             </div>
 
         </div>
@@ -556,16 +607,15 @@ function openDetail(identity) {
 }
 
 
-/* =========================
+/* =========================================
    모달 닫기
-========================= */
+========================================= */
 
 function closeDetail() {
 
     modal.classList.add("hidden");
 
-    document.body.style.overflow =
-        "";
+    document.body.style.overflow = "";
 
 }
 
@@ -584,15 +634,11 @@ document
     );
 
 
-/* ESC */
-
 document.addEventListener(
     "keydown",
     event => {
 
-        if (
-            event.key === "Escape"
-        ) {
+        if (event.key === "Escape") {
 
             closeDetail();
 
@@ -602,29 +648,33 @@ document.addEventListener(
 );
 
 
-/* =========================
+/* =========================================
    이벤트
-========================= */
+========================================= */
 
 searchInput.addEventListener(
     "input",
     renderIdentities
 );
 
+
 seasonFilter.addEventListener(
     "change",
     renderIdentities
 );
+
 
 sinnerFilter.addEventListener(
     "change",
     renderIdentities
 );
 
+
 gradeFilter.addEventListener(
     "change",
     renderIdentities
 );
+
 
 typeFilter.addEventListener(
     "change",
@@ -632,9 +682,9 @@ typeFilter.addEventListener(
 );
 
 
-/* =========================
+/* =========================================
    시작
-========================= */
+========================================= */
 
 setupFilters();
 
