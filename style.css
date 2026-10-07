@@ -10,8 +10,7 @@ body {
         "Noto Sans KR",
         sans-serif;
 
-    background:
-        #101010;
+    background: #101010;
 
     color: #eeeeee;
 }
@@ -32,8 +31,7 @@ body {
 
     background: #171717;
 
-    border-bottom:
-        1px solid #383838;
+    border-bottom: 1px solid #383838;
 
     position: sticky;
     top: 0;
@@ -95,8 +93,7 @@ body {
 
     padding: 0 20px;
 
-    border:
-        1px solid #444444;
+    border: 1px solid #444444;
 
     border-radius: 6px;
 
@@ -125,8 +122,7 @@ body {
 .filter-section {
     display: grid;
 
-    grid-template-columns:
-        repeat(4, 1fr);
+    grid-template-columns: repeat(4, 1fr);
 
     gap: 12px;
 
@@ -138,8 +134,7 @@ body {
 
     padding: 0 12px;
 
-    border:
-        1px solid #444444;
+    border: 1px solid #444444;
 
     border-radius: 5px;
 
@@ -152,6 +147,10 @@ body {
     outline: none;
 }
 
+.filter-section select:focus {
+    border-color: #888888;
+}
+
 
 /* =========================
    시즌
@@ -162,8 +161,7 @@ body {
 
     font-size: 30px;
 
-    border-left:
-        5px solid #c7c7c7;
+    border-left: 5px solid #c7c7c7;
 
     padding-left: 14px;
 }
@@ -174,17 +172,14 @@ body {
 ========================= */
 
 .identity-grid {
-
     display: grid;
 
-    grid-template-columns:
-        repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
 
     gap: 20px;
 }
 
 .identity-card {
-
     background:
         linear-gradient(
             145deg,
@@ -192,8 +187,7 @@ body {
             #171717
         );
 
-    border:
-        1px solid #3c3c3c;
+    border: 1px solid #3c3c3c;
 
     border-radius: 7px;
 
@@ -208,12 +202,9 @@ body {
 }
 
 .identity-card:hover {
+    transform: translateY(-5px);
 
-    transform:
-        translateY(-5px);
-
-    border-color:
-        #858585;
+    border-color: #858585;
 
     background:
         linear-gradient(
@@ -223,9 +214,7 @@ body {
         );
 }
 
-
 .identity-season {
-
     color: #888888;
 
     font-size: 13px;
@@ -233,9 +222,7 @@ body {
     margin-bottom: 12px;
 }
 
-
 .identity-sinner {
-
     color: #aaaaaa;
 
     font-size: 14px;
@@ -243,9 +230,7 @@ body {
     margin-bottom: 6px;
 }
 
-
 .identity-name {
-
     font-size: 21px;
 
     font-weight: bold;
@@ -253,9 +238,7 @@ body {
     margin-bottom: 14px;
 }
 
-
 .identity-grade {
-
     color: #d7d7d7;
 
     letter-spacing: 2px;
@@ -263,9 +246,7 @@ body {
     margin-bottom: 15px;
 }
 
-
 .identity-tags {
-
     display: flex;
 
     flex-wrap: wrap;
@@ -273,18 +254,14 @@ body {
     gap: 6px;
 }
 
-
 .tag {
-
     background: #303030;
 
-    border:
-        1px solid #4a4a4a;
+    border: 1px solid #4a4a4a;
 
     border-radius: 4px;
 
-    padding:
-        4px 8px;
+    padding: 4px 8px;
 
     font-size: 12px;
 
@@ -297,7 +274,6 @@ body {
 ========================= */
 
 .no-result {
-
     padding: 70px 20px;
 
     text-align: center;
@@ -313,11 +289,33 @@ body {
 
 
 /* =========================
+   푸터
+========================= */
+
+.footer {
+    width: min(1400px, 94%);
+
+    margin: 60px auto 30px;
+
+    padding-top: 20px;
+
+    border-top: 1px solid #2c2c2c;
+
+    text-align: center;
+
+    color: #666666;
+
+    font-size: 12px;
+
+    line-height: 1.6;
+}
+
+
+/* =========================
    모달
 ========================= */
 
 .modal {
-
     position: fixed;
 
     inset: 0;
@@ -333,20 +331,15 @@ body {
     padding: 20px;
 }
 
-
 .modal-background {
-
     position: absolute;
 
     inset: 0;
 
-    background:
-        rgba(0, 0, 0, 0.82);
+    background: rgba(0, 0, 0, 0.82);
 }
 
-
 .modal-content {
-
     position: relative;
 
     width: min(1000px, 100%);
@@ -357,8 +350,7 @@ body {
 
     background: #181818;
 
-    border:
-        1px solid #444444;
+    border: 1px solid #444444;
 
     border-radius: 8px;
 
@@ -367,9 +359,7 @@ body {
     z-index: 2;
 }
 
-
 .close-button {
-
     position: absolute;
 
     top: 12px;
@@ -387,6 +377,8 @@ body {
     font-size: 30px;
 
     cursor: pointer;
+
+    z-index: 3;
 }
 
 .close-button:hover {
@@ -399,64 +391,128 @@ body {
 ========================= */
 
 .detail-header {
-
-    border-bottom:
-        1px solid #3c3c3c;
+    border-bottom: 1px solid #3c3c3c;
 
     padding-bottom: 25px;
 
     margin-bottom: 30px;
 }
 
-
 .detail-season {
-
     color: #888888;
 
     font-size: 14px;
 }
 
-
 .detail-sinner {
-
     margin-top: 8px;
 
     color: #aaaaaa;
 }
 
-
 .detail-name {
-
     margin: 8px 0;
 
     font-size: 34px;
 }
 
-
 .detail-grade {
-
     color: #d5d5d5;
 
     letter-spacing: 3px;
 }
 
-
 .detail-section {
-
     margin-top: 30px;
 }
 
-
 .detail-section h3 {
-
     font-size: 21px;
 
+    margin-top: 0;
     margin-bottom: 15px;
 
-    border-left:
-        4px solid #999999;
+    border-left: 4px solid #999999;
 
     padding-left: 10px;
+}
+
+.detail-keywords,
+.detail-attack-types {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+}
+
+.empty-detail {
+    padding: 25px;
+
+    text-align: center;
+
+    color: #777777;
+
+    background: #202020;
+
+    border: 1px dashed #3d3d3d;
+
+    border-radius: 6px;
+}
+
+
+/* =========================
+   공격 타입 배지
+========================= */
+
+.skill-type {
+    display: inline-block;
+
+    padding: 3px 10px;
+
+    border-radius: 4px;
+
+    border: 1px solid #555555;
+
+    background: #2c2c2c;
+
+    color: #dddddd;
+
+    font-size: 13px;
+
+    font-weight: bold;
+}
+
+.skill-type.slash {
+    color: #e8b45c;
+
+    border-color: #7a5a22;
+
+    background: #2d2415;
+}
+
+.skill-type.pierce {
+    color: #7fc4e8;
+
+    border-color: #2a5f7a;
+
+    background: #14262e;
+}
+
+.skill-type.blunt {
+    color: #e88a8a;
+
+    border-color: #7a3030;
+
+    background: #2e1717;
+}
+
+.skill-type.defense {
+    color: #a9d8a0;
+
+    border-color: #3d6b35;
+
+    background: #1a2a18;
 }
 
 
@@ -464,32 +520,50 @@ body {
    스킬
 ========================= */
 
-.skill {
-
+.detail-skill {
     margin-bottom: 20px;
 
     padding: 20px;
 
     background: #202020;
 
-    border:
-        1px solid #383838;
+    border: 1px solid #383838;
 
     border-radius: 6px;
 }
 
+.skill-header {
+    display: flex;
 
-.skill-title {
+    align-items: baseline;
 
+    flex-wrap: wrap;
+
+    gap: 12px;
+
+    margin-bottom: 12px;
+}
+
+.skill-number {
+    color: #888888;
+
+    font-size: 13px;
+}
+
+.skill-name {
     font-size: 19px;
 
     font-weight: bold;
-
-    margin-bottom: 10px;
 }
 
-
 .skill-info {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    align-items: center;
+
+    gap: 14px;
 
     color: #aaaaaa;
 
@@ -498,40 +572,113 @@ body {
     margin-bottom: 15px;
 }
 
+.skill-description {
+    color: #cccccc;
+
+    line-height: 1.7;
+
+    white-space: pre-line;
+
+    margin-bottom: 15px;
+}
+
+.coins-title {
+    margin-bottom: 8px;
+
+    color: #999999;
+
+    font-size: 13px;
+}
 
 .coin {
-
     padding: 12px;
 
     margin-top: 8px;
 
     background: #292929;
 
-    border:
-        1px solid #3d3d3d;
+    border: 1px solid #3d3d3d;
 
     border-radius: 5px;
 }
 
-
 .coin-number {
-
     font-weight: bold;
 
     margin-bottom: 5px;
 }
 
+.coin-power {
+    color: #e0e0e0;
+
+    font-size: 14px;
+
+    margin-bottom: 5px;
+}
 
 .coin-effect {
-
     color: #bbbbbb;
 
     font-size: 13px;
+
+    line-height: 1.6;
 }
 
 
-.description {
+/* =========================
+   방어 스킬 / 패시브
+========================= */
 
+.defense-skill {
+    padding: 20px;
+
+    background: #202020;
+
+    border: 1px solid #383838;
+
+    border-radius: 6px;
+}
+
+.defense-header {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 10px;
+
+    font-size: 18px;
+}
+
+.defense-power {
+    color: #aaaaaa;
+
+    font-size: 14px;
+
+    margin-bottom: 12px;
+}
+
+.defense-description,
+.passive-box {
+    color: #cccccc;
+
+    line-height: 1.7;
+
+    white-space: pre-line;
+}
+
+.passive-box {
+    padding: 20px;
+
+    background: #202020;
+
+    border: 1px solid #383838;
+
+    border-radius: 6px;
+}
+
+.description {
     color: #cccccc;
 
     line-height: 1.7;
@@ -547,60 +694,48 @@ body {
 @media (max-width: 700px) {
 
     .header {
-
         height: 75px;
 
         padding: 0 18px;
     }
 
     .logo {
-
         font-size: 20px;
     }
 
     .header-title {
-
         font-size: 15px;
     }
 
     .container {
-
         width: 92%;
 
         margin-top: 25px;
     }
 
     .filter-section {
-
-        grid-template-columns:
-            repeat(2, 1fr);
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .identity-grid {
-
-        grid-template-columns:
-            repeat(2, 1fr);
+        grid-template-columns: repeat(2, 1fr);
 
         gap: 10px;
     }
 
     .identity-card {
-
         padding: 15px;
     }
 
     .identity-name {
-
         font-size: 17px;
     }
 
     .modal-content {
-
         padding: 22px;
     }
 
     .detail-name {
-
         font-size: 27px;
     }
 }
@@ -609,17 +744,14 @@ body {
 @media (max-width: 430px) {
 
     .identity-grid {
-
-        grid-template-columns:
-            1fr;
+        grid-template-columns: 1fr;
     }
 
     .filter-section {
-
-        grid-template-columns:
-            1fr;
+        grid-template-columns: 1fr;
     }
 }
+
 
 /* =========================================
    인격 카드 이미지
