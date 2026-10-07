@@ -5,6 +5,8 @@
 // - grade: 1, 2, 3 중 하나
 // - attackTypes: "참격" / "관통" / "타격"
 // - skills 안의 type도 위 세 가지 중 하나
+// - skills / defenseSkill 안의 sin(죄악): "분노" "색욕" "나태" "탐식" "우울" "오만" "질투"
+//   (인격의 죄악 목록과 필터는 스킬의 sin 값에서 자동으로 만들어집니다)
 // ============================================================
 
 const identities = [
@@ -24,6 +26,7 @@ const identities = [
             {
                 name: "스킬 1",
                 type: "관통",
+                sin: "분노",
                 basePower: 5,
                 coinCount: 2,
                 coins: [
@@ -43,6 +46,7 @@ const identities = [
         defenseSkill: {
             name: "방어",
             type: "방어",
+            sin: "분노",
             basePower: 10,
             description: "방어 스킬 설명"
         },
@@ -67,6 +71,7 @@ const identities = [
             {
                 name: "스킬 1",
                 type: "타격",
+                sin: "우울",
                 basePower: 5,
                 coinCount: 2,
                 coins: [
@@ -86,6 +91,7 @@ const identities = [
         defenseSkill: {
             name: "방어",
             type: "방어",
+            sin: "우울",
             basePower: 10,
             description: "방어 스킬 설명"
         },
