@@ -1,40 +1,168 @@
+// ============================================================
+// LIMBUS COMPANY 인격 도감
+// script.js
+// ============================================================
+
+
+// ============================================================
+// DOM 요소
+// ============================================================
+
+const identityGrid = document.getElementById("identityGrid");
+
+const searchInput = document.getElementById("searchInput");
+
+const seasonFilter = document.getElementById("seasonFilter");
+const sinnerFilter = document.getElementById("sinnerFilter");
+const gradeFilter = document.getElementById("gradeFilter");
+const typeFilter = document.getElementById("typeFilter");
+
+const seasonTitle = document.getElementById("seasonTitle");
+const noResult = document.getElementById("noResult");
+
+const detailModal = document.getElementById("detailModal");
+const identityDetail = document.getElementById("identityDetail");
+const closeModal = document.getElementById("closeModal");
+
+
+// ============================================================
+// 별 표시
+// ============================================================
+
+function getStars(grade) {
+    return "★".repeat(Number(grade) || 0);
+}
+
+
+// ============================================================
+// HTML 특수문자 처리
+// ============================================================
+
+function escapeHTML(value) {
+    if (value === null || value === undefined) {
+        return "";
+    }
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+// ============================================================
+// 필터 설정
+// ============================================================
+
+function setupFilters() {
+
+    // --------------------------------------------------------
+    // 수감자 필터
+    // --------------------------------------------------------
+
+    if (sinnerFilter) {
+
+        const sinners = [...new Set(
+            identities
+                .map(identity => identity.sinner)
+                .filter(Boolean)
+        )].sort((a, b) => a.localeCompare(b, "ko"));
+
+        // 기존 옵션 초기화
+        sinnerFilter.innerHTML = "";
+
+        const allOption = document.createElement("option");
+        allOption.value = "all";
+        allOption.textContent = "모든 수감자";
+
+        sinnerFilter.appendChild(allOption);
+
+        sinners.forEach(sinner => {
+
+            const option = document.createElement("option");
+
+            option.value = sinner;
+            option.textContent = sinner;
+
+            sinnerFilter.appendChild(option);
+        });
+    }
+}
+
+
+// ============================================================
+// 이미지 HTML
+// ============================================================
+
+function createImageHTML(identity) {
+
+    // 이미지 주소가 없으면 아무것도 표시하지 않음
+    if (!identity.image) {
+        return "";
+    }
+
+    const imageURL = escapeHTML(identity.image);
+    const imageAlt = escapeHTML(identity.name || "인격 이미지");
+
+    return `
+        <div class="identity-image-container">
+            <img
+                class="identity-image"
+                src="${imageURL}"
+                alt="${imageAlt}"
+                loading="lazy"
+                onerror="this.parentElement.style.display='none';"
+            >
+        </div>
+    `;
+}
+
+
+// ============================================================
+// 인격 카드 생성
+// ============================================================
+
 function createCard(identity) {
+
     const card = document.createElement("div");
+
     card.className = "identity-card";
 
+    // --------------------------------------------------------
     // 키워드 태그
+    // --------------------------------------------------------
+
     const tags = (identity.keywords || [])
-        .map(keyword => `<span class="tag">${keyword}</span>`)
+        .map(keyword => {
+            return `<span class="tag">${escapeHTML(keyword)}</span>`;
+        })
         .join("");
 
-    // 이미지가 있을 때만 이미지 표시
-    const imageHTML = identity.image
-        ? `
-            <div class="identity-image-container">
-                <img
-                    class="identity-image"
-                    src="${identity.image}"
-                    alt="${identity.name}"
-                    loading="lazy"
-                    onerror="this.parentElement.style.display='none';"
-                >
-            </div>
-        `
-        : "";
+    // --------------------------------------------------------
+    // 이미지
+    // --------------------------------------------------------
+
+    const imageHTML = createImageHTML(identity);
+
+    // --------------------------------------------------------
+    // 카드 HTML
+    // --------------------------------------------------------
 
     card.innerHTML = `
         ${imageHTML}
 
         <div class="identity-season">
-            ${identity.season}
+            ${escapeHTML(identity.season)}
         </div>
 
         <div class="identity-sinner">
-            ${identity.sinner}
+            ${escapeHTML(identity.sinner)}
         </div>
 
         <div class="identity-name">
-            ${identity.name}
+            ${escapeHTML(identity.name)}
         </div>
 
         <div class="identity-grade">
@@ -46,9 +174,922 @@ function createCard(identity) {
         </div>
     `;
 
+    // --------------------------------------------------------
+    // 카드 클릭
+    // --------------------------------------------------------
+
     card.addEventListener("click", () => {
         openDetail(identity);
     });
 
     return card;
 }
+
+
+// ============================================================
+// 검색용 문자열 만들기
+// ============================================================
+
+function createSearchText(identity) {
+
+    const searchParts = [];
+
+    // 기본 정보
+    searchParts.push(identity.season);
+    searchParts.push(identity.sinner);
+    searchParts.push(identity.name);
+
+    // 공격 타입
+    if (Array.isArray(identity.attackTypes)) {
+        searchParts.push(...identity.attackTypes);
+    }
+
+    // 키워드
+    if (Array.isArray(identity.keywords)) {
+        searchParts.push(...identity.keywords);
+    }
+
+    // --------------------------------------------------------
+    // 스킬
+    // --------------------------------------------------------
+
+    if (Array.isArray(identity.skills)) {
+
+        identity.skills.forEach(skill => {
+
+            if (!skill) {
+                return;
+            }
+
+            searchParts.push(skill.name);
+            searchParts.push(skill.type);
+            searchParts.push(skill.description);
+            searchParts.push(skill.basePower);
+            searchParts.push(skill.coinCount);
+
+            // 코인
+            if (Array.isArray(skill.coins)) {
+
+                skill.coins.forEach(coin => {
+
+                    if (!coin) {
+                        return;
+                    }
+
+                    searchParts.push(coin.power);
+                    searchParts.push(coin.effect);
+                });
+            }
+        });
+    }
+
+    // --------------------------------------------------------
+    // 방어 스킬
+    // --------------------------------------------------------
+
+    if (identity.defenseSkill) {
+
+        searchParts.push(identity.defenseSkill.name);
+        searchParts.push(identity.defenseSkill.type);
+        searchParts.push(identity.defenseSkill.description);
+        searchParts.push(identity.defenseSkill.basePower);
+    }
+
+    // --------------------------------------------------------
+    // 패시브
+    // --------------------------------------------------------
+
+    searchParts.push(identity.passive);
+    searchParts.push(identity.supportPassive);
+
+    return searchParts
+        .filter(value => value !== null && value !== undefined)
+        .join(" ")
+        .toLowerCase();
+}
+
+
+// ============================================================
+// 인격 필터링
+// ============================================================
+
+function filterIdentities() {
+
+    const searchValue = searchInput
+        ? searchInput.value.trim().toLowerCase()
+        : "";
+
+    const selectedSeason = seasonFilter
+        ? seasonFilter.value
+        : "all";
+
+    const selectedSinner = sinnerFilter
+        ? sinnerFilter.value
+        : "all";
+
+    const selectedGrade = gradeFilter
+        ? gradeFilter.value
+        : "all";
+
+    const selectedType = typeFilter
+        ? typeFilter.value
+        : "all";
+
+
+    return identities.filter(identity => {
+
+        // ----------------------------------------------------
+        // 시즌
+        // ----------------------------------------------------
+
+        if (
+            selectedSeason !== "all" &&
+            identity.season !== selectedSeason
+        ) {
+            return false;
+        }
+
+
+        // ----------------------------------------------------
+        // 수감자
+        // ----------------------------------------------------
+
+        if (
+            selectedSinner !== "all" &&
+            identity.sinner !== selectedSinner
+        ) {
+            return false;
+        }
+
+
+        // ----------------------------------------------------
+        // 등급
+        // ----------------------------------------------------
+
+        if (
+            selectedGrade !== "all" &&
+            String(identity.grade) !== String(selectedGrade)
+        ) {
+            return false;
+        }
+
+
+        // ----------------------------------------------------
+        // 공격 타입
+        // ----------------------------------------------------
+
+        if (selectedType !== "all") {
+
+            const attackTypes = identity.attackTypes || [];
+
+            if (!attackTypes.includes(selectedType)) {
+                return false;
+            }
+        }
+
+
+        // ----------------------------------------------------
+        // 검색
+        // ----------------------------------------------------
+
+        if (searchValue !== "") {
+
+            const searchText = createSearchText(identity);
+
+            if (!searchText.includes(searchValue)) {
+                return false;
+            }
+        }
+
+
+        return true;
+    });
+}
+
+
+// ============================================================
+// 시즌 제목
+// ============================================================
+
+function updateSeasonTitle(filteredIdentities) {
+
+    if (!seasonTitle) {
+        return;
+    }
+
+    const selectedSeason = seasonFilter
+        ? seasonFilter.value
+        : "all";
+
+
+    if (selectedSeason === "all") {
+
+        seasonTitle.textContent = "전체 인격";
+
+        return;
+    }
+
+
+    seasonTitle.textContent = selectedSeason;
+}
+
+
+// ============================================================
+// 인격 목록 출력
+// ============================================================
+
+function renderIdentities() {
+
+    if (!identityGrid) {
+        return;
+    }
+
+    const filteredIdentities = filterIdentities();
+
+
+    // 기존 카드 삭제
+    identityGrid.innerHTML = "";
+
+
+    // --------------------------------------------------------
+    // 결과 없음
+    // --------------------------------------------------------
+
+    if (filteredIdentities.length === 0) {
+
+        if (noResult) {
+            noResult.style.display = "block";
+        }
+
+        updateSeasonTitle([]);
+
+        return;
+    }
+
+
+    // 결과 있음
+    if (noResult) {
+        noResult.style.display = "none";
+    }
+
+
+    // 제목 업데이트
+    updateSeasonTitle(filteredIdentities);
+
+
+    // --------------------------------------------------------
+    // 카드 생성
+    // --------------------------------------------------------
+
+    filteredIdentities.forEach(identity => {
+
+        const card = createCard(identity);
+
+        identityGrid.appendChild(card);
+    });
+}
+
+
+// ============================================================
+// 공격 타입 클래스
+// ============================================================
+
+function getAttackTypeClass(type) {
+
+    if (!type) {
+        return "";
+    }
+
+    switch (type) {
+
+        case "참격":
+            return "slash";
+
+        case "관통":
+            return "pierce";
+
+        case "타격":
+            return "blunt";
+
+        case "방어":
+            return "defense";
+
+        default:
+            return "";
+    }
+}
+
+
+// ============================================================
+// 코인 HTML
+// ============================================================
+
+function createCoinHTML(coins) {
+
+    if (!Array.isArray(coins) || coins.length === 0) {
+        return "";
+    }
+
+
+    return coins.map((coin, index) => {
+
+        const power =
+            coin.power !== undefined
+                ? coin.power
+                : "-";
+
+        const effect =
+            coin.effect
+                ? coin.effect
+                : "효과 없음";
+
+
+        return `
+            <div class="coin">
+
+                <div class="coin-number">
+                    코인 ${index + 1}
+                </div>
+
+                <div class="coin-power">
+                    +${escapeHTML(power)}
+                </div>
+
+                <div class="coin-effect">
+                    ${escapeHTML(effect)}
+                </div>
+
+            </div>
+        `;
+
+    }).join("");
+}
+
+
+// ============================================================
+// 스킬 HTML
+// ============================================================
+
+function createSkillHTML(skill, index) {
+
+    if (!skill) {
+        return "";
+    }
+
+
+    const skillName =
+        skill.name || `스킬 ${index + 1}`;
+
+    const skillType =
+        skill.type || "";
+
+    const basePower =
+        skill.basePower !== undefined
+            ? skill.basePower
+            : "-";
+
+    const coinCount =
+        skill.coinCount !== undefined
+            ? skill.coinCount
+            : (Array.isArray(skill.coins) ? skill.coins.length : 0);
+
+    const description =
+        skill.description || "";
+
+
+    const attackClass =
+        getAttackTypeClass(skillType);
+
+
+    const coinsHTML =
+        createCoinHTML(skill.coins);
+
+
+    return `
+        <div class="detail-skill">
+
+            <div class="skill-header">
+
+                <div class="skill-number">
+                    스킬 ${index + 1}
+                </div>
+
+                <div class="skill-name">
+                    ${escapeHTML(skillName)}
+                </div>
+
+            </div>
+
+
+            <div class="skill-info">
+
+                <span class="skill-type ${attackClass}">
+                    ${escapeHTML(skillType)}
+                </span>
+
+                <span>
+                    기본 위력 ${escapeHTML(basePower)}
+                </span>
+
+                <span>
+                    코인 ${escapeHTML(coinCount)}
+                </span>
+
+            </div>
+
+
+            ${
+                description
+                    ? `
+                        <div class="skill-description">
+                            ${escapeHTML(description)}
+                        </div>
+                    `
+                    : ""
+            }
+
+
+            ${
+                coinsHTML
+                    ? `
+                        <div class="coins-title">
+                            코인 효과
+                        </div>
+
+                        <div class="coins">
+                            ${coinsHTML}
+                        </div>
+                    `
+                    : ""
+            }
+
+        </div>
+    `;
+}
+
+
+// ============================================================
+// 방어 스킬 HTML
+// ============================================================
+
+function createDefenseHTML(defenseSkill) {
+
+    if (!defenseSkill) {
+        return "";
+    }
+
+
+    const name =
+        defenseSkill.name || "방어";
+
+    const type =
+        defenseSkill.type || "방어";
+
+    const basePower =
+        defenseSkill.basePower !== undefined
+            ? defenseSkill.basePower
+            : "-";
+
+    const description =
+        defenseSkill.description || "";
+
+
+    return `
+        <div class="detail-section">
+
+            <h3>
+                방어 스킬
+            </h3>
+
+            <div class="defense-skill">
+
+                <div class="defense-header">
+
+                    <span class="skill-type defense">
+                        ${escapeHTML(type)}
+                    </span>
+
+                    <strong>
+                        ${escapeHTML(name)}
+                    </strong>
+
+                </div>
+
+
+                <div class="defense-power">
+                    기본 위력 ${escapeHTML(basePower)}
+                </div>
+
+
+                ${
+                    description
+                        ? `
+                            <div class="defense-description">
+                                ${escapeHTML(description)}
+                            </div>
+                        `
+                        : ""
+                }
+
+            </div>
+
+        </div>
+    `;
+}
+
+
+// ============================================================
+// 키워드 HTML
+// ============================================================
+
+function createKeywordHTML(keywords) {
+
+    if (!Array.isArray(keywords) || keywords.length === 0) {
+        return "";
+    }
+
+
+    return `
+        <div class="detail-keywords">
+
+            ${keywords.map(keyword => {
+
+                return `
+                    <span class="tag">
+                        ${escapeHTML(keyword)}
+                    </span>
+                `;
+
+            }).join("")}
+
+        </div>
+    `;
+}
+
+
+// ============================================================
+// 상세창 이미지
+// ============================================================
+
+function createDetailImageHTML(identity) {
+
+    if (!identity.image) {
+        return "";
+    }
+
+
+    return `
+        <div class="detail-image-container">
+
+            <img
+                class="detail-image"
+                src="${escapeHTML(identity.image)}"
+                alt="${escapeHTML(identity.name || "인격 이미지")}"
+                loading="lazy"
+                onerror="this.parentElement.style.display='none';"
+            >
+
+        </div>
+    `;
+}
+
+
+// ============================================================
+// 상세창 열기
+// ============================================================
+
+function openDetail(identity) {
+
+    if (!detailModal || !identityDetail) {
+        return;
+    }
+
+
+    // --------------------------------------------------------
+    // 이미지
+    // --------------------------------------------------------
+
+    const imageHTML =
+        createDetailImageHTML(identity);
+
+
+    // --------------------------------------------------------
+    // 기본 정보
+    // --------------------------------------------------------
+
+    const keywordsHTML =
+        createKeywordHTML(identity.keywords);
+
+
+    const attackTypesHTML =
+        Array.isArray(identity.attackTypes)
+            ? identity.attackTypes.map(type => {
+
+                return `
+                    <span class="skill-type ${getAttackTypeClass(type)}">
+                        ${escapeHTML(type)}
+                    </span>
+                `;
+
+            }).join("")
+            : "";
+
+
+    // --------------------------------------------------------
+    // 스킬
+    // --------------------------------------------------------
+
+    let skillsHTML = "";
+
+
+    if (
+        Array.isArray(identity.skills) &&
+        identity.skills.length > 0
+    ) {
+
+        skillsHTML = identity.skills
+            .map((skill, index) => {
+                return createSkillHTML(skill, index);
+            })
+            .join("");
+
+    } else {
+
+        skillsHTML = `
+            <div class="empty-detail">
+                등록된 스킬 정보가 없습니다.
+            </div>
+        `;
+    }
+
+
+    // --------------------------------------------------------
+    // 방어
+    // --------------------------------------------------------
+
+    const defenseHTML =
+        createDefenseHTML(identity.defenseSkill);
+
+
+    // --------------------------------------------------------
+    // 패시브
+    // --------------------------------------------------------
+
+    const passiveHTML =
+        identity.passive
+            ? `
+                <div class="detail-section">
+
+                    <h3>
+                        패시브
+                    </h3>
+
+                    <div class="passive-box">
+                        ${escapeHTML(identity.passive)}
+                    </div>
+
+                </div>
+            `
+            : "";
+
+
+    // --------------------------------------------------------
+    // 서포트 패시브
+    // --------------------------------------------------------
+
+    const supportPassiveHTML =
+        identity.supportPassive
+            ? `
+                <div class="detail-section">
+
+                    <h3>
+                        서포트 패시브
+                    </h3>
+
+                    <div class="passive-box">
+                        ${escapeHTML(identity.supportPassive)}
+                    </div>
+
+                </div>
+            `
+            : "";
+
+
+    // --------------------------------------------------------
+    // 상세창 전체
+    // --------------------------------------------------------
+
+    identityDetail.innerHTML = `
+
+        ${imageHTML}
+
+
+        <div class="detail-header">
+
+            <div class="detail-season">
+                ${escapeHTML(identity.season)}
+            </div>
+
+            <div class="detail-sinner">
+                ${escapeHTML(identity.sinner)}
+            </div>
+
+            <h2 class="detail-name">
+                ${escapeHTML(identity.name)}
+            </h2>
+
+            <div class="detail-grade">
+                ${getStars(identity.grade)}
+            </div>
+
+        </div>
+
+
+        ${
+            keywordsHTML
+                ? `
+                    <div class="detail-section">
+
+                        <h3>
+                            키워드
+                        </h3>
+
+                        ${keywordsHTML}
+
+                    </div>
+                `
+                : ""
+        }
+
+
+        ${
+            attackTypesHTML
+                ? `
+                    <div class="detail-section">
+
+                        <h3>
+                            공격 타입
+                        </h3>
+
+                        <div class="detail-attack-types">
+                            ${attackTypesHTML}
+                        </div>
+
+                    </div>
+                `
+                : ""
+        }
+
+
+        <div class="detail-section">
+
+            <h3>
+                스킬
+            </h3>
+
+            <div class="skills">
+                ${skillsHTML}
+            </div>
+
+        </div>
+
+
+        ${defenseHTML}
+
+
+        ${passiveHTML}
+
+
+        ${supportPassiveHTML}
+
+    `;
+
+
+    // --------------------------------------------------------
+    // 모달 표시
+    // --------------------------------------------------------
+
+    detailModal.classList.add("active");
+
+    document.body.classList.add("modal-open");
+}
+
+
+// ============================================================
+// 상세창 닫기
+// ============================================================
+
+function closeDetail() {
+
+    if (!detailModal) {
+        return;
+    }
+
+    detailModal.classList.remove("active");
+
+    document.body.classList.remove("modal-open");
+}
+
+
+// ============================================================
+// 이벤트
+// ============================================================
+
+
+// 검색
+if (searchInput) {
+
+    searchInput.addEventListener("input", () => {
+        renderIdentities();
+    });
+}
+
+
+// 시즌
+if (seasonFilter) {
+
+    seasonFilter.addEventListener("change", () => {
+        renderIdentities();
+    });
+}
+
+
+// 수감자
+if (sinnerFilter) {
+
+    sinnerFilter.addEventListener("change", () => {
+        renderIdentities();
+    });
+}
+
+
+// 등급
+if (gradeFilter) {
+
+    gradeFilter.addEventListener("change", () => {
+        renderIdentities();
+    });
+}
+
+
+// 공격 타입
+if (typeFilter) {
+
+    typeFilter.addEventListener("change", () => {
+        renderIdentities();
+    });
+}
+
+
+// 닫기 버튼
+if (closeModal) {
+
+    closeModal.addEventListener("click", () => {
+        closeDetail();
+    });
+}
+
+
+// ------------------------------------------------------------
+// 모달 배경 클릭
+// ------------------------------------------------------------
+
+if (detailModal) {
+
+    detailModal.addEventListener("click", event => {
+
+        if (event.target === detailModal) {
+            closeDetail();
+        }
+
+    });
+}
+
+
+// ------------------------------------------------------------
+// ESC 키
+// ------------------------------------------------------------
+
+document.addEventListener("keydown", event => {
+
+    if (event.key === "Escape") {
+
+        if (
+            detailModal &&
+            detailModal.classList.contains("active")
+        ) {
+            closeDetail();
+        }
+
+    }
+
+});
+
+
+// ============================================================
+// 초기 실행
+// ============================================================
+
+setupFilters();
+
+renderIdentities();
