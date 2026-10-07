@@ -16,6 +16,7 @@ const seasonFilter = document.getElementById("seasonFilter");
 const sinnerFilter = document.getElementById("sinnerFilter");
 const gradeFilter = document.getElementById("gradeFilter");
 const typeFilter = document.getElementById("typeFilter");
+const sinFilter = document.getElementById("sinFilter");
 
 const seasonTitle = document.getElementById("seasonTitle");
 const noResult = document.getElementById("noResult");
@@ -85,6 +86,66 @@ function setupFilters() {
 
 
 // ============================================================
+// 죄악 (분노, 색욕, 나태, 탐식, 우울, 오만, 질투)
+// ============================================================
+
+function getSinClass(sin) {
+
+    switch (sin) {
+        case "분노":
+            return "wrath";
+        case "색욕":
+            return "lust";
+        case "나태":
+            return "sloth";
+        case "탐식":
+            return "gluttony";
+        case "우울":
+            return "gloom";
+        case "오만":
+            return "pride";
+        case "질투":
+            return "envy";
+        default:
+            return "";
+    }
+}
+
+
+// 인격이 가진 모든 죄악 (스킬 + 방어 스킬에서 자동 수집, 중복 제거)
+function getIdentitySins(identity) {
+
+    const sins = [];
+
+    if (Array.isArray(identity.skills)) {
+        identity.skills.forEach(skill => {
+            if (skill && skill.sin) {
+                sins.push(skill.sin);
+            }
+        });
+    }
+
+    if (identity.defenseSkill && identity.defenseSkill.sin) {
+        sins.push(identity.defenseSkill.sin);
+    }
+
+    return [...new Set(sins)];
+}
+
+
+function createSinBadgeHTML(sin) {
+
+    if (!sin) {
+        return "";
+    }
+
+    return `
+        <span class="sin-badge ${getSinClass(sin)}">${escapeHTML(sin)}</span>
+    `;
+}
+
+
+// ============================================================
 // 이미지 HTML
 // ============================================================
 
@@ -121,7 +182,11 @@ function createCard(identity) {
 
     card.className = "identity-card";
 
-    const tags = (identity.keywords || [])
+    const sinTags = getIdentitySins(identity)
+        .map(sin => createSinBadgeHTML(sin))
+        .join("");
+
+    const tags = sinTags + (identity.keywords || [])
         .map(keyword => `<span class="tag">${escapeHTML(keyword)}</span>`)
         .join("");
 
@@ -173,6 +238,7 @@ function createSearchText(identity) {
 
             searchParts.push(skill.name);
             searchParts.push(skill.type);
+            searchParts.push(skill.sin);
             searchParts.push(skill.description);
             searchParts.push(skill.basePower);
             searchParts.push(skill.coinCount);
@@ -195,6 +261,7 @@ function createSearchText(identity) {
     if (identity.defenseSkill) {
         searchParts.push(identity.defenseSkill.name);
         searchParts.push(identity.defenseSkill.type);
+        searchParts.push(identity.defenseSkill.sin);
         searchParts.push(identity.defenseSkill.description);
         searchParts.push(identity.defenseSkill.basePower);
     }
@@ -223,6 +290,7 @@ function filterIdentities() {
     const selectedSinner = sinnerFilter ? sinnerFilter.value : "all";
     const selectedGrade = gradeFilter ? gradeFilter.value : "all";
     const selectedType = typeFilter ? typeFilter.value : "all";
+    const selectedSin = sinFilter ? sinFilter.value : "all";
 
     return identities.filter(identity => {
 
@@ -242,6 +310,12 @@ function filterIdentities() {
             const attackTypes = identity.attackTypes || [];
 
             if (!attackTypes.includes(selectedType)) {
+                return false;
+            }
+        }
+
+        if (selectedSin !== "all") {
+            if (!getIdentitySins(identity).includes(selectedSin)) {
                 return false;
             }
         }
@@ -412,6 +486,7 @@ function createSkillHTML(skill, index) {
                 ${skillType
                     ? `<span class="skill-type ${attackClass}">${escapeHTML(skillType)}</span>`
                     : ""}
+                ${createSinBadgeHTML(skill.sin)}
                 <span>기본 위력 ${escapeHTML(basePower)}</span>
                 <span>코인 ${escapeHTML(coinCount)}</span>
             </div>
@@ -457,6 +532,7 @@ function createDefenseHTML(defenseSkill) {
 
                 <div class="defense-header">
                     <span class="skill-type defense">${escapeHTML(type)}</span>
+                    ${createSinBadgeHTML(defenseSkill.sin)}
                     <strong>${escapeHTML(name)}</strong>
                 </div>
 
@@ -543,6 +619,10 @@ function openDetail(identity) {
                 .join("")
             : "";
 
+    const sinsHTML = getIdentitySins(identity)
+        .map(sin => createSinBadgeHTML(sin))
+        .join("");
+
     let skillsHTML = "";
 
     if (Array.isArray(identity.skills) && identity.skills.length > 0) {
@@ -607,6 +687,15 @@ function openDetail(identity) {
             `
             : ""}
 
+        ${sinsHTML
+            ? `
+                <div class="detail-section">
+                    <h3>죄악</h3>
+                    <div class="detail-sins">${sinsHTML}</div>
+                </div>
+            `
+            : ""}
+
         <div class="detail-section">
             <h3>스킬</h3>
             <div class="skills">${skillsHTML}</div>
@@ -667,6 +756,10 @@ if (gradeFilter) {
 
 if (typeFilter) {
     typeFilter.addEventListener("change", renderIdentities);
+}
+
+if (sinFilter) {
+    sinFilter.addEventListener("change", renderIdentities);
 }
 
 if (closeModal) {
