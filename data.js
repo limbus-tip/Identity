@@ -30,17 +30,17 @@ const identities = [
                 name: "스킬 1",
                 type: "관통",
                 sin: "분노",
-                notes: ["피아식별 불가", "파괴 불가 코인"],
+                notes: ["피아식별 불가\n(아군 공격 가능)", "파괴 불가 코인"],
                 basePower: 5,
                 coinCount: 2,
                 coins: [
                     {
                         power: 3,
-                        effect: "화상 1 부여"
+                        effect: "화상 1 부여\n대상에게 위력 증가"
                     },
                     {
                         power: 3,
-                        effect: "화상 1 부여"
+                        effect: "화상 1 부여\n다음 턴에 화상 횟수 +1"
                     }
                 ],
                 description: "스킬 1 설명"
