@@ -16,31 +16,31 @@ const identities = [
     {
         season: "시즌 8",
         sinner: "돈키호테",
-        name: "오뜨 꾸뛰르 르 누아르 브랜드 매니저",
+        name: "오트쿠튀르::르누아르 브랜드 매니저",
 
         // 이미지 링크
         image: "https://assets.limbusdeck.com/identities/full-uptied/haute-couture-le-noir-brand-manager-don-quixote.webp",
 
         grade: 3,
-        attackTypes: ["관통"],
-        keywords: ["화상"],
+        attackTypes: ["충전"],
+        keywords: ["진동"],
 
         skills: [
             {
-                name: "스킬 1",
-                type: "관통",
-                sin: "분노",
-                notes: ["피아식별 불가\n(아군 공격 가능)", "파괴 불가 코인"],
+                name: "스킬 1) 못 박히라",
+                type: "타격",
+                sin: "오만",
+                notes: ["[사용시] 대상의 진동 위력과 약속된 못의 합 4당, 최종 위력 +1 (최대 3)\n[사용시] 자신의 보존 위력이 3 이상이면, 코인 위력 +1, 피해량 +40%\n[사용시] 자신과 자신을 제외한 충전 횟수가 가장 적은 르누아르 소속 아군 인격 1명의 충전 횟수 4 증가 (턴당 1회)"],
                 basePower: 5,
                 coinCount: 2,
                 coins: [
                     {
                         power: 3,
-                        effect: "화상 1 부여\n대상에게 위력 증가"
+                        effect: "[적중시] 진동 횟수 2 증가"
                     },
                     {
                         power: 3,
-                        effect: "화상 1 부여\n다음 턴에 화상 횟수 +1"
+                        effect: "[적중시] 자신의 보존 횟수 6 증가"
                     }
                 ],
                 description: "스킬 1 설명"
