@@ -146,6 +146,43 @@ function createSinBadgeHTML(sin) {
 
 
 // ============================================================
+// 특이사항 (수비 스킬 발동 안 함, 피아식별 불가, 파괴 불가 코인 등)
+// notes: ["문구1", "문구2"] 또는 "문구" 하나만 적어도 된다.
+// ============================================================
+
+function normalizeNotes(notes) {
+
+    if (Array.isArray(notes)) {
+        return notes.filter(Boolean);
+    }
+
+    if (notes) {
+        return [notes];
+    }
+
+    return [];
+}
+
+
+function createNotesHTML(notes) {
+
+    const list = normalizeNotes(notes);
+
+    if (list.length === 0) {
+        return "";
+    }
+
+    return `
+        <div class="skill-notes">
+            ${list
+                .map(note => `<span class="note-chip">${escapeHTML(note)}</span>`)
+                .join("")}
+        </div>
+    `;
+}
+
+
+// ============================================================
 // 이미지 HTML
 // ============================================================
 
@@ -239,6 +276,7 @@ function createSearchText(identity) {
             searchParts.push(skill.name);
             searchParts.push(skill.type);
             searchParts.push(skill.sin);
+            searchParts.push(...normalizeNotes(skill.notes));
             searchParts.push(skill.description);
             searchParts.push(skill.basePower);
             searchParts.push(skill.coinCount);
@@ -262,12 +300,14 @@ function createSearchText(identity) {
         searchParts.push(identity.defenseSkill.name);
         searchParts.push(identity.defenseSkill.type);
         searchParts.push(identity.defenseSkill.sin);
+        searchParts.push(...normalizeNotes(identity.defenseSkill.notes));
         searchParts.push(identity.defenseSkill.description);
         searchParts.push(identity.defenseSkill.basePower);
     }
 
     searchParts.push(identity.passive);
     searchParts.push(identity.supportPassive);
+    searchParts.push(...normalizeNotes(identity.notes));
 
     return searchParts
         .filter(value => value !== null && value !== undefined)
@@ -495,6 +535,8 @@ function createSkillHTML(skill, index) {
                 ? `<div class="skill-description">${escapeHTML(description)}</div>`
                 : ""}
 
+            ${createNotesHTML(skill.notes)}
+
             ${coinsHTML
                 ? `
                     <div class="coins-title">코인 효과</div>
@@ -543,6 +585,8 @@ function createDefenseHTML(defenseSkill) {
                 ${description
                     ? `<div class="defense-description">${escapeHTML(description)}</div>`
                     : ""}
+
+                ${createNotesHTML(defenseSkill.notes)}
 
             </div>
 
@@ -692,6 +736,15 @@ function openDetail(identity) {
                 <div class="detail-section">
                     <h3>죄악</h3>
                     <div class="detail-sins">${sinsHTML}</div>
+                </div>
+            `
+            : ""}
+
+        ${normalizeNotes(identity.notes).length > 0
+            ? `
+                <div class="detail-section">
+                    <h3>특이사항</h3>
+                    ${createNotesHTML(identity.notes)}
                 </div>
             `
             : ""}
