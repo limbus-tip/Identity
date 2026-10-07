@@ -53,42 +53,34 @@ function escapeHTML(value) {
 
 
 // ============================================================
-// 필터 설정
+// 필터 설정 (수감자 목록을 데이터에서 자동 생성)
 // ============================================================
 
 function setupFilters() {
 
-    // --------------------------------------------------------
-    // 수감자 필터
-    // --------------------------------------------------------
-
-    if (sinnerFilter) {
-
-        const sinners = [...new Set(
-            identities
-                .map(identity => identity.sinner)
-                .filter(Boolean)
-        )].sort((a, b) => a.localeCompare(b, "ko"));
-
-        // 기존 옵션 초기화
-        sinnerFilter.innerHTML = "";
-
-        const allOption = document.createElement("option");
-        allOption.value = "all";
-        allOption.textContent = "모든 수감자";
-
-        sinnerFilter.appendChild(allOption);
-
-        sinners.forEach(sinner => {
-
-            const option = document.createElement("option");
-
-            option.value = sinner;
-            option.textContent = sinner;
-
-            sinnerFilter.appendChild(option);
-        });
+    if (!sinnerFilter) {
+        return;
     }
+
+    const sinners = [...new Set(
+        identities
+            .map(identity => identity.sinner)
+            .filter(Boolean)
+    )].sort((a, b) => a.localeCompare(b, "ko"));
+
+    sinnerFilter.innerHTML = "";
+
+    const allOption = document.createElement("option");
+    allOption.value = "all";
+    allOption.textContent = "모든 수감자";
+    sinnerFilter.appendChild(allOption);
+
+    sinners.forEach(sinner => {
+        const option = document.createElement("option");
+        option.value = sinner;
+        option.textContent = sinner;
+        sinnerFilter.appendChild(option);
+    });
 }
 
 
@@ -98,7 +90,6 @@ function setupFilters() {
 
 function createImageHTML(identity) {
 
-    // 이미지 주소가 없으면 아무것도 표시하지 않음
     if (!identity.image) {
         return "";
     }
@@ -130,53 +121,19 @@ function createCard(identity) {
 
     card.className = "identity-card";
 
-    // --------------------------------------------------------
-    // 키워드 태그
-    // --------------------------------------------------------
-
     const tags = (identity.keywords || [])
-        .map(keyword => {
-            return `<span class="tag">${escapeHTML(keyword)}</span>`;
-        })
+        .map(keyword => `<span class="tag">${escapeHTML(keyword)}</span>`)
         .join("");
 
-    // --------------------------------------------------------
-    // 이미지
-    // --------------------------------------------------------
-
-    const imageHTML = createImageHTML(identity);
-
-    // --------------------------------------------------------
-    // 카드 HTML
-    // --------------------------------------------------------
-
     card.innerHTML = `
-        ${imageHTML}
+        ${createImageHTML(identity)}
 
-        <div class="identity-season">
-            ${escapeHTML(identity.season)}
-        </div>
-
-        <div class="identity-sinner">
-            ${escapeHTML(identity.sinner)}
-        </div>
-
-        <div class="identity-name">
-            ${escapeHTML(identity.name)}
-        </div>
-
-        <div class="identity-grade">
-            ${getStars(identity.grade)}
-        </div>
-
-        <div class="identity-tags">
-            ${tags}
-        </div>
+        <div class="identity-season">${escapeHTML(identity.season)}</div>
+        <div class="identity-sinner">${escapeHTML(identity.sinner)}</div>
+        <div class="identity-name">${escapeHTML(identity.name)}</div>
+        <div class="identity-grade">${getStars(identity.grade)}</div>
+        <div class="identity-tags">${tags}</div>
     `;
-
-    // --------------------------------------------------------
-    // 카드 클릭
-    // --------------------------------------------------------
 
     card.addEventListener("click", () => {
         openDetail(identity);
@@ -194,24 +151,17 @@ function createSearchText(identity) {
 
     const searchParts = [];
 
-    // 기본 정보
     searchParts.push(identity.season);
     searchParts.push(identity.sinner);
     searchParts.push(identity.name);
 
-    // 공격 타입
     if (Array.isArray(identity.attackTypes)) {
         searchParts.push(...identity.attackTypes);
     }
 
-    // 키워드
     if (Array.isArray(identity.keywords)) {
         searchParts.push(...identity.keywords);
     }
-
-    // --------------------------------------------------------
-    // 스킬
-    // --------------------------------------------------------
 
     if (Array.isArray(identity.skills)) {
 
@@ -227,7 +177,6 @@ function createSearchText(identity) {
             searchParts.push(skill.basePower);
             searchParts.push(skill.coinCount);
 
-            // 코인
             if (Array.isArray(skill.coins)) {
 
                 skill.coins.forEach(coin => {
@@ -243,21 +192,12 @@ function createSearchText(identity) {
         });
     }
 
-    // --------------------------------------------------------
-    // 방어 스킬
-    // --------------------------------------------------------
-
     if (identity.defenseSkill) {
-
         searchParts.push(identity.defenseSkill.name);
         searchParts.push(identity.defenseSkill.type);
         searchParts.push(identity.defenseSkill.description);
         searchParts.push(identity.defenseSkill.basePower);
     }
-
-    // --------------------------------------------------------
-    // 패시브
-    // --------------------------------------------------------
 
     searchParts.push(identity.passive);
     searchParts.push(identity.supportPassive);
@@ -279,67 +219,26 @@ function filterIdentities() {
         ? searchInput.value.trim().toLowerCase()
         : "";
 
-    const selectedSeason = seasonFilter
-        ? seasonFilter.value
-        : "all";
-
-    const selectedSinner = sinnerFilter
-        ? sinnerFilter.value
-        : "all";
-
-    const selectedGrade = gradeFilter
-        ? gradeFilter.value
-        : "all";
-
-    const selectedType = typeFilter
-        ? typeFilter.value
-        : "all";
-
+    const selectedSeason = seasonFilter ? seasonFilter.value : "all";
+    const selectedSinner = sinnerFilter ? sinnerFilter.value : "all";
+    const selectedGrade = gradeFilter ? gradeFilter.value : "all";
+    const selectedType = typeFilter ? typeFilter.value : "all";
 
     return identities.filter(identity => {
 
-        // ----------------------------------------------------
-        // 시즌
-        // ----------------------------------------------------
-
-        if (
-            selectedSeason !== "all" &&
-            identity.season !== selectedSeason
-        ) {
+        if (selectedSeason !== "all" && identity.season !== selectedSeason) {
             return false;
         }
 
-
-        // ----------------------------------------------------
-        // 수감자
-        // ----------------------------------------------------
-
-        if (
-            selectedSinner !== "all" &&
-            identity.sinner !== selectedSinner
-        ) {
+        if (selectedSinner !== "all" && identity.sinner !== selectedSinner) {
             return false;
         }
 
-
-        // ----------------------------------------------------
-        // 등급
-        // ----------------------------------------------------
-
-        if (
-            selectedGrade !== "all" &&
-            String(identity.grade) !== String(selectedGrade)
-        ) {
+        if (selectedGrade !== "all" && String(identity.grade) !== String(selectedGrade)) {
             return false;
         }
-
-
-        // ----------------------------------------------------
-        // 공격 타입
-        // ----------------------------------------------------
 
         if (selectedType !== "all") {
-
             const attackTypes = identity.attackTypes || [];
 
             if (!attackTypes.includes(selectedType)) {
@@ -347,20 +246,11 @@ function filterIdentities() {
             }
         }
 
-
-        // ----------------------------------------------------
-        // 검색
-        // ----------------------------------------------------
-
         if (searchValue !== "") {
-
-            const searchText = createSearchText(identity);
-
-            if (!searchText.includes(searchValue)) {
+            if (!createSearchText(identity).includes(searchValue)) {
                 return false;
             }
         }
-
 
         return true;
     });
@@ -371,26 +261,36 @@ function filterIdentities() {
 // 시즌 제목
 // ============================================================
 
-function updateSeasonTitle(filteredIdentities) {
+function updateSeasonTitle() {
 
     if (!seasonTitle) {
         return;
     }
 
-    const selectedSeason = seasonFilter
-        ? seasonFilter.value
-        : "all";
+    const selectedSeason = seasonFilter ? seasonFilter.value : "all";
+
+    seasonTitle.textContent =
+        selectedSeason === "all" ? "전체 인격" : selectedSeason;
+}
 
 
-    if (selectedSeason === "all") {
+// ============================================================
+// 결과 없음 표시
+// ============================================================
 
-        seasonTitle.textContent = "전체 인격";
+function setNoResultVisible(visible) {
 
+    if (!noResult) {
         return;
     }
 
-
-    seasonTitle.textContent = selectedSeason;
+    // hidden 클래스는 display:none !important 이므로
+    // style.display 대신 클래스를 넣고 빼야 한다.
+    if (visible) {
+        noResult.classList.remove("hidden");
+    } else {
+        noResult.classList.add("hidden");
+    }
 }
 
 
@@ -406,46 +306,19 @@ function renderIdentities() {
 
     const filteredIdentities = filterIdentities();
 
-
-    // 기존 카드 삭제
     identityGrid.innerHTML = "";
 
-
-    // --------------------------------------------------------
-    // 결과 없음
-    // --------------------------------------------------------
+    updateSeasonTitle();
 
     if (filteredIdentities.length === 0) {
-
-        if (noResult) {
-            noResult.style.display = "block";
-        }
-
-        updateSeasonTitle([]);
-
+        setNoResultVisible(true);
         return;
     }
 
-
-    // 결과 있음
-    if (noResult) {
-        noResult.style.display = "none";
-    }
-
-
-    // 제목 업데이트
-    updateSeasonTitle(filteredIdentities);
-
-
-    // --------------------------------------------------------
-    // 카드 생성
-    // --------------------------------------------------------
+    setNoResultVisible(false);
 
     filteredIdentities.forEach(identity => {
-
-        const card = createCard(identity);
-
-        identityGrid.appendChild(card);
+        identityGrid.appendChild(createCard(identity));
     });
 }
 
@@ -456,24 +329,15 @@ function renderIdentities() {
 
 function getAttackTypeClass(type) {
 
-    if (!type) {
-        return "";
-    }
-
     switch (type) {
-
         case "참격":
             return "slash";
-
         case "관통":
             return "pierce";
-
         case "타격":
             return "blunt";
-
         case "방어":
             return "defense";
-
         default:
             return "";
     }
@@ -490,35 +354,20 @@ function createCoinHTML(coins) {
         return "";
     }
 
-
     return coins.map((coin, index) => {
 
-        const power =
-            coin.power !== undefined
-                ? coin.power
-                : "-";
+        if (!coin) {
+            return "";
+        }
 
-        const effect =
-            coin.effect
-                ? coin.effect
-                : "효과 없음";
-
+        const power = coin.power !== undefined ? coin.power : "-";
+        const effect = coin.effect ? coin.effect : "효과 없음";
 
         return `
             <div class="coin">
-
-                <div class="coin-number">
-                    코인 ${index + 1}
-                </div>
-
-                <div class="coin-power">
-                    +${escapeHTML(power)}
-                </div>
-
-                <div class="coin-effect">
-                    ${escapeHTML(effect)}
-                </div>
-
+                <div class="coin-number">코인 ${index + 1}</div>
+                <div class="coin-power">+${escapeHTML(power)}</div>
+                <div class="coin-effect">${escapeHTML(effect)}</div>
             </div>
         `;
 
@@ -536,92 +385,47 @@ function createSkillHTML(skill, index) {
         return "";
     }
 
+    const skillName = skill.name || `스킬 ${index + 1}`;
+    const skillType = skill.type || "";
 
-    const skillName =
-        skill.name || `스킬 ${index + 1}`;
-
-    const skillType =
-        skill.type || "";
-
-    const basePower =
-        skill.basePower !== undefined
-            ? skill.basePower
-            : "-";
+    const basePower = skill.basePower !== undefined ? skill.basePower : "-";
 
     const coinCount =
         skill.coinCount !== undefined
             ? skill.coinCount
             : (Array.isArray(skill.coins) ? skill.coins.length : 0);
 
-    const description =
-        skill.description || "";
+    const description = skill.description || "";
 
-
-    const attackClass =
-        getAttackTypeClass(skillType);
-
-
-    const coinsHTML =
-        createCoinHTML(skill.coins);
-
+    const attackClass = getAttackTypeClass(skillType);
+    const coinsHTML = createCoinHTML(skill.coins);
 
     return `
         <div class="detail-skill">
 
             <div class="skill-header">
-
-                <div class="skill-number">
-                    스킬 ${index + 1}
-                </div>
-
-                <div class="skill-name">
-                    ${escapeHTML(skillName)}
-                </div>
-
+                <div class="skill-number">스킬 ${index + 1}</div>
+                <div class="skill-name">${escapeHTML(skillName)}</div>
             </div>
-
 
             <div class="skill-info">
-
-                <span class="skill-type ${attackClass}">
-                    ${escapeHTML(skillType)}
-                </span>
-
-                <span>
-                    기본 위력 ${escapeHTML(basePower)}
-                </span>
-
-                <span>
-                    코인 ${escapeHTML(coinCount)}
-                </span>
-
+                ${skillType
+                    ? `<span class="skill-type ${attackClass}">${escapeHTML(skillType)}</span>`
+                    : ""}
+                <span>기본 위력 ${escapeHTML(basePower)}</span>
+                <span>코인 ${escapeHTML(coinCount)}</span>
             </div>
 
+            ${description
+                ? `<div class="skill-description">${escapeHTML(description)}</div>`
+                : ""}
 
-            ${
-                description
-                    ? `
-                        <div class="skill-description">
-                            ${escapeHTML(description)}
-                        </div>
-                    `
-                    : ""
-            }
-
-
-            ${
-                coinsHTML
-                    ? `
-                        <div class="coins-title">
-                            코인 효과
-                        </div>
-
-                        <div class="coins">
-                            ${coinsHTML}
-                        </div>
-                    `
-                    : ""
-            }
+            ${coinsHTML
+                ? `
+                    <div class="coins-title">코인 효과</div>
+                    <div class="coins">${coinsHTML}</div>
+                `
+                : ""}
 
         </div>
     `;
@@ -638,58 +442,31 @@ function createDefenseHTML(defenseSkill) {
         return "";
     }
 
-
-    const name =
-        defenseSkill.name || "방어";
-
-    const type =
-        defenseSkill.type || "방어";
-
+    const name = defenseSkill.name || "방어";
+    const type = defenseSkill.type || "방어";
     const basePower =
-        defenseSkill.basePower !== undefined
-            ? defenseSkill.basePower
-            : "-";
-
-    const description =
-        defenseSkill.description || "";
-
+        defenseSkill.basePower !== undefined ? defenseSkill.basePower : "-";
+    const description = defenseSkill.description || "";
 
     return `
         <div class="detail-section">
 
-            <h3>
-                방어 스킬
-            </h3>
+            <h3>방어 스킬</h3>
 
             <div class="defense-skill">
 
                 <div class="defense-header">
-
-                    <span class="skill-type defense">
-                        ${escapeHTML(type)}
-                    </span>
-
-                    <strong>
-                        ${escapeHTML(name)}
-                    </strong>
-
+                    <span class="skill-type defense">${escapeHTML(type)}</span>
+                    <strong>${escapeHTML(name)}</strong>
                 </div>
-
 
                 <div class="defense-power">
                     기본 위력 ${escapeHTML(basePower)}
                 </div>
 
-
-                ${
-                    description
-                        ? `
-                            <div class="defense-description">
-                                ${escapeHTML(description)}
-                            </div>
-                        `
-                        : ""
-                }
+                ${description
+                    ? `<div class="defense-description">${escapeHTML(description)}</div>`
+                    : ""}
 
             </div>
 
@@ -708,20 +485,11 @@ function createKeywordHTML(keywords) {
         return "";
     }
 
-
     return `
         <div class="detail-keywords">
-
-            ${keywords.map(keyword => {
-
-                return `
-                    <span class="tag">
-                        ${escapeHTML(keyword)}
-                    </span>
-                `;
-
-            }).join("")}
-
+            ${keywords
+                .map(keyword => `<span class="tag">${escapeHTML(keyword)}</span>`)
+                .join("")}
         </div>
     `;
 }
@@ -737,10 +505,8 @@ function createDetailImageHTML(identity) {
         return "";
     }
 
-
     return `
         <div class="detail-image-container">
-
             <img
                 class="detail-image"
                 src="${escapeHTML(identity.image)}"
@@ -748,7 +514,6 @@ function createDetailImageHTML(identity) {
                 loading="lazy"
                 onerror="this.parentElement.style.display='none';"
             >
-
         </div>
     `;
 }
@@ -764,213 +529,103 @@ function openDetail(identity) {
         return;
     }
 
-
-    // --------------------------------------------------------
-    // 이미지
-    // --------------------------------------------------------
-
-    const imageHTML =
-        createDetailImageHTML(identity);
-
-
-    // --------------------------------------------------------
-    // 기본 정보
-    // --------------------------------------------------------
-
-    const keywordsHTML =
-        createKeywordHTML(identity.keywords);
-
+    const imageHTML = createDetailImageHTML(identity);
+    const keywordsHTML = createKeywordHTML(identity.keywords);
 
     const attackTypesHTML =
         Array.isArray(identity.attackTypes)
-            ? identity.attackTypes.map(type => {
-
-                return `
+            ? identity.attackTypes
+                .map(type => `
                     <span class="skill-type ${getAttackTypeClass(type)}">
                         ${escapeHTML(type)}
                     </span>
-                `;
-
-            }).join("")
+                `)
+                .join("")
             : "";
-
-
-    // --------------------------------------------------------
-    // 스킬
-    // --------------------------------------------------------
 
     let skillsHTML = "";
 
-
-    if (
-        Array.isArray(identity.skills) &&
-        identity.skills.length > 0
-    ) {
+    if (Array.isArray(identity.skills) && identity.skills.length > 0) {
 
         skillsHTML = identity.skills
-            .map((skill, index) => {
-                return createSkillHTML(skill, index);
-            })
+            .map((skill, index) => createSkillHTML(skill, index))
             .join("");
 
     } else {
 
         skillsHTML = `
-            <div class="empty-detail">
-                등록된 스킬 정보가 없습니다.
-            </div>
+            <div class="empty-detail">등록된 스킬 정보가 없습니다.</div>
         `;
     }
 
+    const defenseHTML = createDefenseHTML(identity.defenseSkill);
 
-    // --------------------------------------------------------
-    // 방어
-    // --------------------------------------------------------
+    const passiveHTML = identity.passive
+        ? `
+            <div class="detail-section">
+                <h3>패시브</h3>
+                <div class="passive-box">${escapeHTML(identity.passive)}</div>
+            </div>
+        `
+        : "";
 
-    const defenseHTML =
-        createDefenseHTML(identity.defenseSkill);
-
-
-    // --------------------------------------------------------
-    // 패시브
-    // --------------------------------------------------------
-
-    const passiveHTML =
-        identity.passive
-            ? `
-                <div class="detail-section">
-
-                    <h3>
-                        패시브
-                    </h3>
-
-                    <div class="passive-box">
-                        ${escapeHTML(identity.passive)}
-                    </div>
-
-                </div>
-            `
-            : "";
-
-
-    // --------------------------------------------------------
-    // 서포트 패시브
-    // --------------------------------------------------------
-
-    const supportPassiveHTML =
-        identity.supportPassive
-            ? `
-                <div class="detail-section">
-
-                    <h3>
-                        서포트 패시브
-                    </h3>
-
-                    <div class="passive-box">
-                        ${escapeHTML(identity.supportPassive)}
-                    </div>
-
-                </div>
-            `
-            : "";
-
-
-    // --------------------------------------------------------
-    // 상세창 전체
-    // --------------------------------------------------------
+    const supportPassiveHTML = identity.supportPassive
+        ? `
+            <div class="detail-section">
+                <h3>서포트 패시브</h3>
+                <div class="passive-box">${escapeHTML(identity.supportPassive)}</div>
+            </div>
+        `
+        : "";
 
     identityDetail.innerHTML = `
 
         ${imageHTML}
 
-
         <div class="detail-header">
-
-            <div class="detail-season">
-                ${escapeHTML(identity.season)}
-            </div>
-
-            <div class="detail-sinner">
-                ${escapeHTML(identity.sinner)}
-            </div>
-
-            <h2 class="detail-name">
-                ${escapeHTML(identity.name)}
-            </h2>
-
-            <div class="detail-grade">
-                ${getStars(identity.grade)}
-            </div>
-
+            <div class="detail-season">${escapeHTML(identity.season)}</div>
+            <div class="detail-sinner">${escapeHTML(identity.sinner)}</div>
+            <h2 class="detail-name">${escapeHTML(identity.name)}</h2>
+            <div class="detail-grade">${getStars(identity.grade)}</div>
         </div>
 
+        ${keywordsHTML
+            ? `
+                <div class="detail-section">
+                    <h3>키워드</h3>
+                    ${keywordsHTML}
+                </div>
+            `
+            : ""}
 
-        ${
-            keywordsHTML
-                ? `
-                    <div class="detail-section">
-
-                        <h3>
-                            키워드
-                        </h3>
-
-                        ${keywordsHTML}
-
-                    </div>
-                `
-                : ""
-        }
-
-
-        ${
-            attackTypesHTML
-                ? `
-                    <div class="detail-section">
-
-                        <h3>
-                            공격 타입
-                        </h3>
-
-                        <div class="detail-attack-types">
-                            ${attackTypesHTML}
-                        </div>
-
-                    </div>
-                `
-                : ""
-        }
-
+        ${attackTypesHTML
+            ? `
+                <div class="detail-section">
+                    <h3>공격 타입</h3>
+                    <div class="detail-attack-types">${attackTypesHTML}</div>
+                </div>
+            `
+            : ""}
 
         <div class="detail-section">
-
-            <h3>
-                스킬
-            </h3>
-
-            <div class="skills">
-                ${skillsHTML}
-            </div>
-
+            <h3>스킬</h3>
+            <div class="skills">${skillsHTML}</div>
         </div>
 
-
         ${defenseHTML}
-
-
         ${passiveHTML}
-
-
         ${supportPassiveHTML}
 
     `;
 
+    // 스크롤 위치를 맨 위로
+    const content = detailModal.querySelector(".modal-content");
+    if (content) {
+        content.scrollTop = 0;
+    }
 
-    // --------------------------------------------------------
-    // 모달 표시
-    // --------------------------------------------------------
-
-    detailModal.classList.add("active");
-
+    // hidden 클래스를 빼야 모달이 보인다.
+    detailModal.classList.remove("hidden");
     document.body.classList.add("modal-open");
 }
 
@@ -985,8 +640,7 @@ function closeDetail() {
         return;
     }
 
-    detailModal.classList.remove("active");
-
+    detailModal.classList.add("hidden");
     document.body.classList.remove("modal-open");
 }
 
@@ -995,70 +649,42 @@ function closeDetail() {
 // 이벤트
 // ============================================================
 
-
-// 검색
 if (searchInput) {
-
-    searchInput.addEventListener("input", () => {
-        renderIdentities();
-    });
+    searchInput.addEventListener("input", renderIdentities);
 }
 
-
-// 시즌
 if (seasonFilter) {
-
-    seasonFilter.addEventListener("change", () => {
-        renderIdentities();
-    });
+    seasonFilter.addEventListener("change", renderIdentities);
 }
 
-
-// 수감자
 if (sinnerFilter) {
-
-    sinnerFilter.addEventListener("change", () => {
-        renderIdentities();
-    });
+    sinnerFilter.addEventListener("change", renderIdentities);
 }
 
-
-// 등급
 if (gradeFilter) {
-
-    gradeFilter.addEventListener("change", () => {
-        renderIdentities();
-    });
+    gradeFilter.addEventListener("change", renderIdentities);
 }
 
-
-// 공격 타입
 if (typeFilter) {
-
-    typeFilter.addEventListener("change", () => {
-        renderIdentities();
-    });
+    typeFilter.addEventListener("change", renderIdentities);
 }
 
-
-// 닫기 버튼
 if (closeModal) {
-
-    closeModal.addEventListener("click", () => {
-        closeDetail();
-    });
+    closeModal.addEventListener("click", closeDetail);
 }
 
 
-// ------------------------------------------------------------
-// 모달 배경 클릭
-// ------------------------------------------------------------
-
+// 모달 바깥(어두운 배경) 클릭
+// 배경은 .modal-background 요소가 덮고 있어서
+// event.target이 detailModal 자신이 아니라 배경 요소가 된다.
 if (detailModal) {
 
     detailModal.addEventListener("click", event => {
 
-        if (event.target === detailModal) {
+        if (
+            event.target === detailModal ||
+            event.target.classList.contains("modal-background")
+        ) {
             closeDetail();
         }
 
@@ -1066,18 +692,12 @@ if (detailModal) {
 }
 
 
-// ------------------------------------------------------------
 // ESC 키
-// ------------------------------------------------------------
-
 document.addEventListener("keydown", event => {
 
     if (event.key === "Escape") {
 
-        if (
-            detailModal &&
-            detailModal.classList.contains("active")
-        ) {
+        if (detailModal && !detailModal.classList.contains("hidden")) {
             closeDetail();
         }
 
