@@ -688,6 +688,8 @@ body {
     font-size: 13px;
 
     line-height: 1.6;
+
+    white-space: pre-line;
 }
 
 
@@ -719,6 +721,8 @@ body {
     font-size: 13px;
 
     line-height: 1.5;
+
+    white-space: pre-line;
 }
 
 .defense-skill .skill-notes {
