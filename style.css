@@ -692,6 +692,41 @@ body {
 
 
 /* =========================
+   특이사항 (notes)
+========================= */
+
+.skill-notes {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+    margin: 0 0 15px;
+}
+
+.note-chip {
+    padding: 4px 10px;
+
+    border-radius: 4px;
+
+    border: 1px solid #6b5a2e;
+
+    background: #2a2415;
+
+    color: #e6cf8a;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+.defense-skill .skill-notes {
+    margin: 12px 0 0;
+}
+
+
+/* =========================
    방어 스킬 / 패시브
 ========================= */
 
