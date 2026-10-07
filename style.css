@@ -122,7 +122,7 @@ body {
 .filter-section {
     display: grid;
 
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
 
     gap: 12px;
 
@@ -438,7 +438,8 @@ body {
 }
 
 .detail-keywords,
-.detail-attack-types {
+.detail-attack-types,
+.detail-sins {
     display: flex;
 
     flex-wrap: wrap;
@@ -513,6 +514,71 @@ body {
     border-color: #3d6b35;
 
     background: #1a2a18;
+}
+
+
+/* =========================
+   죄악 배지
+========================= */
+
+.sin-badge {
+    display: inline-block;
+
+    padding: 3px 10px;
+
+    border-radius: 4px;
+
+    border: 1px solid #555555;
+
+    background: #2c2c2c;
+
+    color: #dddddd;
+
+    font-size: 13px;
+
+    font-weight: bold;
+}
+
+.sin-badge.wrath {
+    color: #ff7b6b;
+    border-color: #8a2f25;
+    background: #2f1714;
+}
+
+.sin-badge.lust {
+    color: #ff9d57;
+    border-color: #8a4a1c;
+    background: #2f2014;
+}
+
+.sin-badge.sloth {
+    color: #f0d44f;
+    border-color: #7d6a14;
+    background: #2c2712;
+}
+
+.sin-badge.gluttony {
+    color: #8fd96a;
+    border-color: #3d7a22;
+    background: #1a2a14;
+}
+
+.sin-badge.gloom {
+    color: #5fd3d3;
+    border-color: #1f6f6f;
+    background: #102a2a;
+}
+
+.sin-badge.pride {
+    color: #7f9cff;
+    border-color: #2f4aa8;
+    background: #141b30;
+}
+
+.sin-badge.envy {
+    color: #c78bff;
+    border-color: #6a3a99;
+    background: #231730;
 }
 
 
@@ -715,6 +781,10 @@ body {
 
     .filter-section {
         grid-template-columns: repeat(2, 1fr);
+    }
+
+    .filter-section select {
+        min-width: 0;
     }
 
     .identity-grid {
