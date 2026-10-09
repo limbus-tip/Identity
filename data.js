@@ -49,7 +49,7 @@ const identities = [
                 name: "스킬 1-2) 심판!",
                 type: "타격",
                 sin: "오만",
-                notes: ["조건: 자신을 제외한 르누아르 소속 아군 인격이 적에게 공격 시작 전, 메인 타겟을 일방 공격 (턴당 1회, 패시브 '신의 뜻과 가치가 우리와 함께하리…')\n[합 불가능]\n이 스킬은 아래 효과가 적용됨\n- 수비 스킬을 발동시키지 않음\n- 외부 효과로 재사용할 수 없음\n- 이 스킬 종료 시까지 대상의 체력이 1 미만으로 감소하지 않음/n[사용시] 대상의 진동 위력과 약속된 못의 합 =4당, 최종 위력 +1 (최대 3)\n[사용시] 자신의 보존 위력이 3 이상이면, 코인 위력 +1, 피해량 +40%"],
+                notes: ["조건: 자신을 제외한 르누아르 소속 아군 인격이 적에게 공격 시작 전, 메인 타겟을 일방 공격 (턴당 1회, 패시브 '신의 뜻과 가치가 우리와 함께하리…')\n[합 불가능]\n이 스킬은 아래 효과가 적용됨\n- 수비 스킬을 발동시키지 않음\n- 외부 효과로 재사용할 수 없음\n- 이 스킬 종료 시까지 대상의 체력이 1 미만으로 감소하지 않음\n[사용시] 대상의 진동 위력과 약속된 못의 합 =4당, 최종 위력 +1 (최대 3)\n[사용시] 자신의 보존 위력이 3 이상이면, 코인 위력 +1, 피해량 +40%"],
                 basePower: 6,
                 coinCount: 1,
                 coins: [
@@ -77,46 +77,43 @@ const identities = [
     {
         season: "Standard Fare",
         sinner: "파우스트",
-        name: "예시 인격",
+        name: "LCB 수김자",
 
         // 이미지가 없으면 이 줄을 아예 빼도 됨
-        image: "https://example.com/example.webp",
+        image: "https://assets.limbusdeck.com/identities/full/lcb-sinner-faust.webp",
 
-        grade: 2,
-        attackTypes: ["타격"],
-        keywords: ["진동"],
+        grade: 1,
+        attackTypes: ["키워드 없음"],
+        keywords: ["키워드 없음"],
 
         skills: [
             {
-                name: "스킬 1",
+                name: "스킬 1) 내려베기",
                 type: "타격",
-                sin: "우울",
-                notes: ["수비 스킬 발동 안 함"],
-                basePower: 5,
-                coinCount: 2,
+                sin: "오만",
+                notes: [""],
+                basePower: 4,
+                coinCount: 1,
                 coins: [
                     {
-                        power: 2,
+                        power: 7,
                         effect: "진동 1 부여"
                     },
-                    {
-                        power: 3,
-                        effect: "진동 횟수 1 증가"
-                    }
+                    
                 ],
-                description: "예시 데이터입니다."
+                description: "스킬 1 설명"
             }
         ],
 
         defenseSkill: {
-            name: "방어",
-            type: "방어",
-            sin: "우울",
-            basePower: 10,
-            description: "방어 스킬 설명"
+            name: "회피",
+            type: "회피",
+            sin: "오만",
+            basePower: 2,
+            description: "코인 1(+10)"
         },
 
-        passive: "패시브 설명",
-        supportPassive: "서포트 패시브 설명"
+        passive: "분석\n\n오만 X2 공명\n[자신 피해량 증가]부정적인 효과가 걸려있는 대상에게 가하는 피해량 +10%",
+        supportPassive: "관찰\n\n오만 3 보유\n[적 공격 레벨 감소]\n최대 체력이 가장 높은 아군"
     }
 ];
